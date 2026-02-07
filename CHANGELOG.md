@@ -1,3 +1,29 @@
+# 更新日志
+
+## [Unreleased] - 2026-02-07
+
+### 新增 🎉
+
+- ⭐ **Stream V2 模式支持** - 集成官方 `dingtalk-stream-sdk-go`
+  - 使用 Builder 模式创建客户端
+  - 支持机器人消息监听
+  - 支持事件监听
+  - 无需公网 IP，自动重连
+  - 新增 `examples/stream_v2/main.go` 示例
+
+### 文档 📚
+
+- 新增 `docs/STREAM_V2_GUIDE.md` - Stream V2 完整使用指南
+- 更新 `docs/QUICK_START.md` - 添加 Stream 模式快速入门
+- 更新 `README.md` - 添加核心模式对比表格
+
+### 优化 ✨
+
+- 更新依赖: 添加 `github.com/open-dingtalk/dingtalk-stream-sdk-go v0.9.1`
+- 优化项目结构说明，更清晰的示例分类
+
+---
+
 # DingTalk SDK
 
 [![Go Version](https://img.shields.io/badge/Go-1.22+-blue.svg)](https://golang.org)

@@ -12,7 +12,7 @@ func main() {
 	credential := client.Credential{
 		ClientID:     "your_client_id",     // 替换为你的 Client ID
 		ClientSecret: "your_client_secret", // 替换为你的 Client Secret
-	}
+}
 
 	// 创建钉钉客户端
 	dingClient := client.NewDingTalkClient(credential)

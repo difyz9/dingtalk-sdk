@@ -42,6 +42,11 @@ type OAuthTokenResult struct {
 	ExpiresIn    int    `json:"expires_in"`
 }
 
+// OpenConversationIdResult OpenConversationId 结果
+type OpenConversationIdResult struct {
+	OpenConversationId string `json:"openConversationId"`
+}
+
 // Credential 钉钉应用凭证
 type Credential struct {
 	ClientID     string `json:"client_id"`
@@ -52,6 +57,7 @@ type Credential struct {
 type DingTalkClientInterface interface {
 	GetAccessToken() (string, error)
 	UploadMedia(content []byte, filename, mediaType, mimeType string) (*MediaUploadResult, error)
+	GetOpenConversationId(chatID string) (string, error)
 }
 
 // DingTalkClient 钉钉客户端
@@ -199,6 +205,56 @@ func (c *DingTalkClient) UploadMedia(content []byte, filename, mediaType, mimeTy
 	return media, nil
 }
 
+// SendRobotMessage 发送企业内部机器人消息
+// 文档: https://open.dingtalk.com/document/orgapp/robot-sends-group-messages
+func (c *DingTalkClient) SendRobotMessage(chatID string, message interface{}) error {
+	accessToken, err := c.GetAccessToken()
+	if err != nil {
+		return err
+	}
+
+	// 构造请求参数
+	params := map[string]interface{}{
+		"chatId": chatID,
+		"msg":    message,
+	}
+
+	data, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("https://oapi.dingtalk.com/chat/send?access_token=%s", url2.QueryEscape(accessToken))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	var result map[string]interface{}
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(bodyBytes, &result); err != nil {
+		return err
+	}
+
+	if errcode, ok := result["errcode"].(float64); ok && errcode != 0 {
+		return fmt.Errorf("send robot message failed: %v", result["errmsg"])
+	}
+	return nil
+}
+
 // getAccessTokenFromDingTalk 从钉钉获取 AccessToken
 func (c *DingTalkClient) getAccessTokenFromDingTalk() (*OAuthTokenResult, error) {
 	// OpenAPI doc: https://open.dingtalk.com/document/orgapp/obtain-orgapp-token
@@ -235,4 +291,89 @@ func (c *DingTalkClient) getAccessTokenFromDingTalk() (*OAuthTokenResult, error)
 		return nil, errors.New(tokenResult.ErrorMessage)
 	}
 	return tokenResult, nil
+}
+
+// GetOpenConversationId 通过 chatId 获取 OpenConversationId
+// 文档: https://open.dingtalk.com/document/development/obtain-group-openconversationid
+func (c *DingTalkClient) GetOpenConversationId(chatID string) (string, error) {
+	accessToken, err := c.GetAccessToken()
+	if err != nil {
+		return "", err
+	}
+
+	// 使用新版 API 地址
+	url := fmt.Sprintf("https://api.dingtalk.com/v1.0/im/chat/%s/convertToOpenConversationId", url2.PathEscape(chatID))
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return "", err
+	}
+
+	// 新版 API 使用 Header 传递 token
+	req.Header.Set("x-acs-dingtalk-access-token", accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+
+	// 检查 HTTP 状态码
+	if res.StatusCode != 200 {
+		return "", fmt.Errorf("API request failed with status %d: %s", res.StatusCode, string(bodyBytes))
+	}
+
+	result := &OpenConversationIdResult{}
+	if err = json.Unmarshal(bodyBytes, result); err != nil {
+		return "", err
+	}
+
+	return result.OpenConversationId, nil
+}
+
+// SendWebhookMessage 通过 Webhook URL 发送消息（自定义机器人）
+// webhookURL: 完整的 webhook 地址，例如: https://oapi.dingtalk.com/robot/send?access_token=xxx
+// message: 消息内容，支持 text/markdown/link 等格式
+func SendWebhookMessage(webhookURL string, message interface{}) error {
+	data, err := json.Marshal(message)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	var result map[string]interface{}
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(bodyBytes, &result); err != nil {
+		return err
+	}
+
+	if errcode, ok := result["errcode"].(float64); ok && errcode != 0 {
+		return fmt.Errorf("send webhook message failed: %v", result["errmsg"])
+	}
+	return nil
 }
