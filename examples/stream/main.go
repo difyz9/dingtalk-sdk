@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/dingtalk-sdk/client"
-	"github.com/dingtalk-sdk/stream"
+	"github.com/difyz9/dingtalk-sdk.git/client"
+	"github.com/difyz9/dingtalk-sdk.git/stream"
 	"github.com/google/uuid"
 )
 

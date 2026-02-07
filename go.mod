@@ -1,4 +1,4 @@
-module github.com/dingtalk-sdk
+module github.com/difyz9/dingtalk-sdk.git
 
 go 1.22
 

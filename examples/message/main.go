@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/dingtalk-sdk/message"
+	"github.com/difyz9/dingtalk-sdk.git/message"
 )
 
 func main() {

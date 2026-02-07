@@ -16,7 +16,7 @@
 ### 安装
 
 ```bash
-go get github.com/dingtalk-sdk
+go get github.com/difyz9/dingtalk-sdk.git
 ```
 
 ### 基础使用
@@ -27,7 +27,7 @@ go get github.com/dingtalk-sdk
 package main
 
 import (
-    "github.com/dingtalk-sdk/client"
+    "github.com/difyz9/dingtalk-sdk.git/client"
 )
 
 func main() {
@@ -55,7 +55,7 @@ func main() {
 package main
 
 import (
-    "github.com/dingtalk-sdk/message"
+    "github.com/difyz9/dingtalk-sdk.git/message"
 )
 
 func main() {
@@ -82,7 +82,7 @@ package main
 
 import (
     "io/ioutil"
-    "github.com/dingtalk-sdk/client"
+    "github.com/difyz9/dingtalk-sdk.git/client"
 )
 
 func main() {
@@ -118,7 +118,7 @@ func main() {
 package main
 
 import (
-    "github.com/dingtalk-sdk/stream"
+    "github.com/difyz9/dingtalk-sdk.git/stream"
     "github.com/google/uuid"
 )
 
