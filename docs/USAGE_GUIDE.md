@@ -211,7 +211,7 @@ go run examples/stream_v2/main.go
 测试结果：
 ```
 📩 收到第 1 条消息:
-  发送人: 管培佐
+  发送人: 蜘蛛侠
   内容: 1
   会话 ID: cidGCUBTzi5e6/D2Drgx6UHT2cAEyncMJx6pMZePDxhb2k=
   消息类型: text
@@ -372,19 +372,19 @@ go run examples/alicloud_sdk/main.go
 测试日志：
 ```
 📩 收到第 1 条消息:
-  发送人: 管培佐
+  发送人: 蜘蛛侠
   内容: 好
   → 回复: 默认智能应答
   ✅ 发送成功
 
 📩 收到第 2 条消息:
-  发送人: 管培佐
+  发送人: 蜘蛛侠
   内容: 1
   → 回复: 文本消息
   ✅ 发送成功
 
 📩 收到第 4 条消息:
-  发送人: 管培佐
+  发送人: 蜘蛛侠
   内容: help
   → 回复: 帮助信息
   ✅ 发送成功
